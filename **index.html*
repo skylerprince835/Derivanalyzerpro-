@@ -22,5 +22,3 @@ function connect(){
  ws.onclose=()=>setTimeout(connect,2000);
 }
 connect();
-</script></body></html>[x]
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
