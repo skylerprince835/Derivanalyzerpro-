@@ -1,0 +1,26 @@
+
+
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V75 Scanner</title><style>body{background:#000;color:#fff;font-family:Arial;margin:0;padding:10px}.box{background:#111;margin:12px 0;padding:16px;border-radius:12px;border:1px solid #222}button{width:100%;padding:16px;background:#00ff88;border:0;border-radius:12px;font-weight:bold;font-size:16px}input{width:100%;padding:14px;background:#222;border:1px solid #333;color:#fff;border-radius:10px;box-sizing:border-box}.pay{position:fixed;inset:0;background:#000;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}.card{background:#111;border:2px solid #00ff88;padding:24px;border-radius:16px;width:100%;max-width:380px;text-align:center}</style></head><body><div id="pay" class="pay"><div class="card"><h2>🔒 PREMIUM SCANNER</h2><p style="color:#00ff88;font-size:22px;font-weight:bold">KES 5,000</p><p>TILL: 3509241</p><input id="code" placeholder="M-Pesa Code"><button style="margin-top:10px" onclick="if(code.value.length>5){localStorage.setItem('paid','1');location.reload()}else alert('Enter valid M-Pesa code')">UNLOCK NOW</button><br><br><button onclick="let p=prompt('Owner PIN?');if(p=='1234'){localStorage.setItem('paid','1');location.reload()}else alert('Wrong PIN')" style="background:#222;color:#aaa;font-size:13px">OWNER LOGIN - PIN 1234</button></div></div><div class="box"><h2 style="color:#00ff88;margin:0">🔥 V75 COLD DIGIT PRO</h2><small id="status" style="color:#888">Connecting to Deriv...</small></div><div class="box"><div id="last">Waiting for ticks...</div><div id="counts" style="margin-top:12px;color:#aaa;word-break:break-all"></div><div id="signal" style="font-size:26px;font-weight:bold;margin-top:15px;color:#00ff88"></div></div><div class="box"><button onclick="localStorage.clear();location.reload()" style="background:#222;color:#fff">Log Out</button></div><script>
+if(localStorage.getItem('paid')=='1') document.getElementById('pay').style.display='none';
+let digits=[];
+function connect(){
+ let ws=new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');
+ ws.onopen=()=>{document.getElementById('status').innerText='Connected - Live'; ws.send(JSON.stringify({ticks:'R_75',subscribe:1}))};
+ ws.onmessage=e=>{
+  let d=JSON.parse(e.data);
+  if(d.tick){
+   let price=d.tick.quote; let ld=parseInt(price.toString().slice(-1));
+   digits.push(ld); if(digits.length>100) digits.shift();
+   let c=Array(10).fill(0); digits.forEach(x=>c++);
+   let m=Math.min(...c); let cold=c.indexOf(m);
+   document.getElementById('last').innerHTML='Price: <b style=color:#00ff88>'+price+'</b> | Last: '+digits.slice(-25).join(' ');
+   document.getElementById('counts').innerHTML=c.map((v,i)=>i+':'+v).join(' | ');
+   document.getElementById('signal').innerHTML=m<=6?'✅ TRADE '+cold+' COLD '+m+'x - 90%':'⏳ WAIT - Market Hot';
+  }
+ };
+ ws.onerror=()=>{document.getElementById('status').innerText='Reconnecting...'; setTimeout(connect,2000)};
+ ws.onclose=()=>setTimeout(connect,2000);
+}
+connect();
+</script></body></html>[x]
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
