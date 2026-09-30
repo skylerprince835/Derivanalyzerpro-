@@ -5,48 +5,45 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>V75 Pro</title>
-<style>
-body{background:#000;color:#fff;font-family:Arial;padding:10px;margin:0}
-.box{background:#111;border:1px solid #333;border-radius:12px;padding:15px;margin:10px 0}
-button{width:100%;padding:15px;background:#00ff88;border:0;border-radius:10px;font-weight:bold}
-</style>
+<style>body{background:#000;color:#fff;font-family:Arial;padding:10px;margin:0}.box{background:#111;border:1px solid #333;border-radius:12px;padding:15px;margin:10px 0}</style>
 </head>
 <body>
-<div class="box">
-<h2 style="color:#00ff88">🔥 V75 COLD DIGIT PRO</h2>
-<small id="st" style="color:yellow">Connecting to Deriv fast server...</small>
-</div>
-<div class="box">
-<div id="price"  price...</div>
-<div id="last" style="margin-top:10px"></div>
-<div id="cnt" style="margin-top:10px;color:#aaa"></div>
-<div id="sig" style="font-size:28px;color:#00ff88;margin-top:15px;font-weight:bold"></div>
-</div>
+<div class="box"><h2 style="color:#00ff88;margin:0">🔥 V75 COLD PRO</h2><small id="st" style="color:yellow">Connecting...</small></div>
+<div class="box"><div id="price" style="font-size:20px">Waiting...</div><div id="last" style="margin-top:8px"></div><div id="cnt" style="margin-top:10px;color:#aaa;font-size:12px"></div><div id="sig" style="font-size:26px;color:#00ff88;margin-top:12px;font-weight:bold"></div></div>
 <script>
 let digits=[];
-let ws=new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');
-ws.onopen=()=>{
- document.getElementById('st').innerText='LIVE Connected ✓ FAST';
- ws.send(JSON.stringify({ticks:'R_75',subscribe:1}))
-};
-ws.onmessage=(e)=>{
- let j=JSON.parse(e.data);
- if(j.tick){
-  let q=j.tick.quote;
-  let last=parseInt(q.toString().slice(-1));
-  digits.push(last);
-  if(digits.length>100)digits.shift();
-  let counts=Array(10).fill(0);
-  digits.forEach(x=>counts++);
-  let min=Math.min(...counts);
-  let cold=counts.indexOf(min);
-  document.getElementById('price').innerHTML='Price: <b style=color:#00ff88>'+q+'</b>';
-  document.getElementById('last').innerHTML='Last 20: '+digits.slice(-20).join(' ');
-  document.getElementById('cnt').innerHTML=counts.map((v,i)=>i+':'+v).join(' | ');
-  document.getElementById('sig').innerHTML=min<=6?'✅ TRADE '+cold+' COLD '+min+'x':'⏳ WAIT - Hot';
- }
-};
-ws.onclose=()=>{document.getElementById('st').innerText='Reconnecting...'; setTimeout(()=>location.reload(),2000)};
+let ws;
+function go(){
+ document.getElementById('st').innerText='Connecting to Deriv...';
+ try{
+  ws=new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');
+  ws.onopen=()=>{
+   document.getElementById('st').innerText='LIVE ✓ Connected';
+   ws.send(JSON.stringify({ticks:'R_75'}));
+  };
+  ws.onmessage=(e)=>{
+   let j=JSON.parse(e.data);
+   if(j.tick){
+    let q=j.tick.quote;
+    let last=parseInt(q.toString().slice(-1));
+    digits.push(last);
+    if(digits.length>100)digits.shift();
+    let counts=[0,0,0,0,0,0];
+    digits.forEach(x=>{counts[x]++});
+    let min=Math.min(...counts);
+    let cold=counts.indexOf(min);
+    document.getElementById('price').innerHTML='Price: <b style=color:#00ff88>'+q+'</b>';
+    document.getElementById('last').innerHTML='Last 20: '+digits.slice(-20).join(' ');
+    document.getElementById('cnt').innerHTML=counts.map((v,i)=>i+':'+v).join(' | ');
+    document.getElementById('sig').innerHTML=min<=6?'✅ TRADE '+cold+' COLD '+min+'x':'⏳ WAIT';
+   }
+   if(j.subscription){ ws.send(JSON.stringify({ticks:'R_75',subscribe:1})); }
+  };
+  ws.onclose=()=>{document.getElementById('st').innerText='Reconnecting in 3s...'; setTimeout(go,3000);};
+  ws.onerror=()=>{document.getElementById('st').innerText='Error - Retrying...'; ws.close();};
+ }catch(err){ setTimeout(go,3000); }
+}
+go();
 </script>
 </body>
-  </html>
+</html>
