@@ -10,4 +10,5 @@ let digits=[];let ws=new WebSocket('wss://ws.binaryws.com/websockets/v3?app_id=1
 ws.onopen=()=>ws.send(JSON.stringify({ticks:'R_75',subscribe:1}));
 ws.onmessage=e=>{let d=JSON.parse(e.data);if(d.tick){let ld=parseInt(d.tick.quote.toString().slice(-1));digits.push(ld);if(digits.length>100)digits.shift();let c=Array(10).fill(0);digits.forEach(x=>c[x]++);let m=Math.min(...c);let cold=c.indexOf(m);document.getElementById('last').innerHTML='Live: '+d.tick.quote+' | Last: '+digits.slice(-20).join(' ');document.getElementById('counts').innerHTML=c.map((v,i)=>i+':'+v).join(' | ');document.getElementById('signal').innerHTML=m<=6?'✅ TRADE '+cold+' COLD '+m+'x':'⏳ WAIT';}};
 </script></body></html>
-                   
+
+  
