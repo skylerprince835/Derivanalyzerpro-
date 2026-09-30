@@ -28,7 +28,7 @@ function go(){
     let last=parseInt(q.toString().slice(-1));
     digits.push(last);
     if(digits.length>100)digits.shift();
-    let counts=[0,0,0,0,0,0];
+    let counts=[0,0,0,0,0,0,0,0,0,0];
     digits.forEach(x=>{counts[x]++});
     let min=Math.min(...counts);
     let cold=counts.indexOf(min);
