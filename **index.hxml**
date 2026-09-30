@@ -1,0 +1,12 @@
+
+
+
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V75 Scanner</title><style>body{background:#000;color:#fff;font-family:Arial;margin:0;padding:10px}.box{background:#111;margin:10px 0;padding:15px;border-radius:12px;border:1px solid #222}button{width:100%;padding:16px;background:#00ff88;border:0;border-radius:12px;font-weight:bold}input{width:100%;padding:14px;background:#222;border:1px solid #333;color:#fff;border-radius:10px}.pay{position:fixed;inset:0;background:#000;z-index:999;display:flex;align-items:center;justify-content:center;padding:20px}.card{background:#111;border:2px solid #00ff88;padding:25px;border-radius:15px;width:100%;max-width:400px;text-align:center}</style></head><body>
+<div id="pay" class="pay"><div class="card"><h2>🔒 PREMIUM SCANNER</h2><p>KES 5,000 | TILL 3509241</p><input id="code" placeholder="M-Pesa Code"><button onclick="if(code.value.length>5){localStorage.setItem('paid','1');location.reload()}">UNLOCK</button><br><br><button onclick="let p=prompt('PIN');if(p=='1234'){localStorage.setItem('paid','1');location.reload()}" style="background:#222;color:#aaa">OWNER LOGIN PIN 1234</button></div></div>
+<div class="box"><h2 style="color:#00ff88">🔥 V75 COLD DIGIT PRO</h2><div id="last">Connecting...</div><div id="counts"></div><div id="signal" style="font-size:24px;font-weight:bold;color:#00ff88;margin-top:10px"></div></div>
+<script>
+if(localStorage.getItem('paid')=='1')document.getElementById('pay').style.display='none';
+let digits=[];let ws=new WebSocket('wss://ws.binaryws.com/websockets/v3?app_id=1089');
+ws.onopen=()=>ws.send(JSON.stringify({ticks:'R_75',subscribe:1}));
+ws.onmessage=e=>{let d=JSON.parse(e.data);if(d.tick){let ld=parseInt(d.tick.quote.toString().slice(-1));digits.push(ld);if(digits.length>100)digits.shift();let c=Array(10).fill(0);digits.forEach(x=>c[x]++);let m=Math.min(...c);let cold=c.indexOf(m);document.getElementById('last').innerHTML='Live: '+d.tick.quote+' | Last: '+digits.slice(-20).join(' ');document.getElementById('counts').innerHTML=c.map((v,i)=>i+':'+v).join(' | ');document.getElementById('signal').innerHTML=m<=6?'✅ TRADE '+cold+' COLD '+m+'x':'⏳ WAIT';}};
+</script></body></html>
